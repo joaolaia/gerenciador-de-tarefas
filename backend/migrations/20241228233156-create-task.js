@@ -21,7 +21,7 @@ module.exports = {
       status: {
         type: Sequelize.STRING
       },
-      deadline: {
+      dueDate: {
         type: Sequelize.DATE
       },
       userId: {
@@ -39,5 +39,6 @@ module.exports = {
   },
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('Tasks');
+    await queryInterface.removeColumn('Tasks', 'dueDate');
   }
 };
