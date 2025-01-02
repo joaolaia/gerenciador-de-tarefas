@@ -6,10 +6,10 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ component: Component }) => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('token');
 
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   return <Component />;
