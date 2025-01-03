@@ -8,6 +8,7 @@ class Task extends Model {
   public status!: string;
   public dueDate!: Date | null;
   public category!: string;
+  public userId!: number;
 }
 
 Task.init(
@@ -31,6 +32,10 @@ Task.init(
     },
     category: {
       type: DataTypes.STRING,
+      allowNull: false,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
   },

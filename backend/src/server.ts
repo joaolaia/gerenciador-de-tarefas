@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import auth from './routes/auth';
 import sequelize from './database';
 import taskRoutes from './routes/task';
+import { defineAssociations } from './models/associations';
+
 
 dotenv.config();
 
@@ -14,6 +16,8 @@ app.use(express.json());
 
 app.use('/api', auth);
 app.use('/api/tasks', taskRoutes);
+
+defineAssociations();
 
 sequelize
   .authenticate()
