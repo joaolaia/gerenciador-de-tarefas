@@ -193,6 +193,7 @@ const DashboardPage: React.FC = () => {
           columns={columns}
           rowKey="id"
           pagination={{ pageSize: 5 }}
+          locale={{ emptyText: 'Nenhuma tarefa cadastrada' }}
         />
       </Content>
     </Layout>

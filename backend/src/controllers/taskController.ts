@@ -1,9 +1,21 @@
 import { Request, Response } from 'express';
 import Task from '../models/task';
+import jwt from 'jsonwebtoken';
 
 export const getAllTasks = async (req: Request, res: Response): Promise<void> => {
   try {
-    const tasks = await Task.findAll();
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      res.status(401).json({ message: 'Token não fornecido.' });
+      return;
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: number };
+    const userId = decoded.id;
+
+    const tasks = await Task.findAll({
+      where: { userId },
+    });
 
     if (tasks.length === 0) {
       res.status(404).json({ message: 'Nenhuma tarefa cadastrada no momento.' });
@@ -20,11 +32,21 @@ export const getAllTasks = async (req: Request, res: Response): Promise<void> =>
 export const createTask = async (req: Request, res: Response): Promise<void> => {
     try {
       const { title, description, status, dueDate, category } = req.body;
+
+      const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      res.status(401).json({ message: 'Token não fornecido.' });
+      return;
+    }
   
       if (!title || !category) {
         res.status(400).json({ message: 'Título e categoria são obrigatórios.' });
         return;
       }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: number };
+    const userId = decoded.id;
+
 
       const newTask = await Task.create({
         title,
@@ -32,6 +54,7 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
         status: status || 'pendente',
         dueDate: dueDate || null,
         category,
+        userId,
       });
   
       res.status(201).json({
