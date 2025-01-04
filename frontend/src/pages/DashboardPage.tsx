@@ -1,23 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Layout,
-  Input,
-  Button,
-  Table,
-  Space,
-  message,
-  Card,
-  Select,
-} from 'antd';
-import {
-  LogoutOutlined,
-  UserOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+import { Layout, message } from 'antd';
 import axios from '../services/api';
+import HeaderComponent from '../components/Header';
+import FiltersComponent from '../components/Filters';
+import TasksTableComponent from '../components/TasksTable';
+import TaskDetailsComponent from '../components/TaskDetails';
 
-const { Header, Content } = Layout;
-const { Option } = Select;
+const { Content } = Layout;
 
 interface Task {
   id: number;
@@ -131,115 +120,30 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  const columns = [
-    {
-      title: 'Título',
-      dataIndex: 'title',
-      key: 'title',
-    },
-    {
-      title: 'Categoria',
-      dataIndex: 'category',
-      key: 'category',
-    },
-    {
-      title: 'Prazo',
-      dataIndex: 'dueDate',
-      key: 'dueDate',
-      render: (_: string, record: Task) =>
-        record.status === 'concluído'
-          ? 'Concluída'
-          : new Date(record.dueDate).toLocaleDateString('pt-BR'),
-    },
-  ];
-
   return (
     <Layout>
-      <Header style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Space>
-          <Button type="primary" icon={<UserOutlined />} onClick={() => {}}>
-            Perfil
-          </Button>
-          <Button
-            type="primary"
-            danger
-            icon={<LogoutOutlined />}
-            onClick={handleLogout}
-          >
-            Sair
-          </Button>
-        </Space>
-      </Header>
+      <HeaderComponent handleLogout={handleLogout} />
       <Content style={{ padding: '20px', display: 'flex', gap: '20px' }}>
         <div style={{ flex: 1 }}>
-          <Space direction="vertical" style={{ width: '100%', marginBottom: 16 }}>
-            <Input
-              placeholder="Buscar tarefa"
-              prefix={<SearchOutlined />}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Space>
-              <Select
-                placeholder="Filtrar por Categoria"
-                value={filterCategory}
-                onChange={(value) => setFilterCategory(value)}
-                style={{ width: 180 }}
-              >
-                <Option value="">Todas</Option>
-                <Option value="Trabalho">Trabalho</Option>
-                <Option value="Estudo">Estudo</Option>
-                <Option value="Pessoal">Pessoal</Option>
-              </Select>
-              <Select
-                placeholder="Filtrar por Status"
-                value={filterStatus}
-                onChange={(value) => setFilterStatus(value)}
-                style={{ width: 180 }}
-              >
-                <Option value="">Todos</Option>
-                <Option value="pendente">Pendente</Option>
-                <Option value="concluído">Concluído</Option>
-              </Select>
-              <Button onClick={clearFilters}>Limpar Filtros</Button>
-            </Space>
-          </Space>
-          <Table
-            dataSource={filteredTasks}
-            columns={columns}
-            rowKey="id"
-            pagination={{ pageSize: 5 }}
-            locale={{ emptyText: 'Nenhuma tarefa cadastrada' }}
-            onRow={(record) => ({
-              onClick: () => setSelectedTask(record),
-            })}
+          <FiltersComponent
+            search={search}
+            filterCategory={filterCategory}
+            filterStatus={filterStatus}
+            setSearch={setSearch}
+            setFilterCategory={setFilterCategory}
+            setFilterStatus={setFilterStatus}
+            clearFilters={clearFilters}
+          />
+          <TasksTableComponent
+            filteredTasks={filteredTasks}
+            onTaskSelect={setSelectedTask}
           />
         </div>
         <div style={{ flex: 1 }}>
-          <Card title="Detalhes da Tarefa">
-            {selectedTask ? (
-              <div>
-                <p><strong>Título:</strong> {selectedTask.title}</p>
-                <p><strong>Categoria:</strong> {selectedTask.category}</p>
-                <p><strong>Data de Entrega:</strong> {new Date(selectedTask.dueDate).toLocaleDateString('pt-BR')}</p>
-                <p><strong>Descrição:</strong> {selectedTask.description}</p>
-                <Space style={{ marginTop: 16 }}>
-                  <Button type="primary" onClick={() => {}}>
-                    Adicionar Tarefa
-                  </Button>
-                  <Button onClick={() => {}}>Editar Tarefa</Button>
-                  <Button type="default" onClick={() => handleTaskAction('complete')}>
-                    Concluir
-                  </Button>
-                  <Button type="primary" danger onClick={() => handleTaskAction('delete')}>
-                    Excluir
-                  </Button>
-                </Space>
-              </div>
-            ) : (
-              <p>Nenhuma tarefa selecionada.</p>
-            )}
-          </Card>
+          <TaskDetailsComponent
+            task={selectedTask}
+            onTaskAction={handleTaskAction}
+          />
         </div>
       </Content>
     </Layout>
