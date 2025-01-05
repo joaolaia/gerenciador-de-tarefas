@@ -4,11 +4,14 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 import 'antd/dist/reset.css';
+import { TasksProvider } from './contexts/TasksContext';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <TasksProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </TasksProvider>
   </React.StrictMode>
 );
