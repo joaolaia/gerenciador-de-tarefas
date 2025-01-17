@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, Select, DatePicker, Button, message } from 'antd';
 import { useTasks } from '../contexts/TasksContext';
 import api from '../services/api';
@@ -9,43 +9,37 @@ const { Option } = Select;
 interface EditTaskModalProps {
   visible: boolean;
   onClose: () => void;
-  taskToEdit: Task | null;
 }
 
-const EditTaskModal: React.FC<EditTaskModalProps> = ({ visible, onClose, taskToEdit }) => {
+const EditTaskModal: React.FC<EditTaskModalProps> = ({ visible, onClose }) => {
+  const { selectedTask, categories, refreshTasks } = useTasks();
   const [form] = Form.useForm();
-  const { categories, refreshTasks } = useTasks();
   const [isNewCategory, setIsNewCategory] = useState(false);
 
   useEffect(() => {
-    if (taskToEdit) {
+    if (selectedTask) {
       form.setFieldsValue({
-        title: taskToEdit.title,
-        description: taskToEdit.description,
-        dueDate: dayjs(taskToEdit.dueDate),
-        category: taskToEdit.category,
+        ...selectedTask,
+        dueDate: dayjs(selectedTask.dueDate),
       });
     }
-  }, [taskToEdit, form]);
+  }, [selectedTask, form]);
 
-  const handleEdit = async (values: any) => {
-    if (!taskToEdit) return;
-
+  const handleSubmit = async (values: any) => {
     try {
       const updatedTask = {
-        ...taskToEdit,
-        title: values.title,
-        description: values.description,
+        ...selectedTask,
+        ...values,
         category: isNewCategory ? values.newCategory : values.category,
         dueDate: values.dueDate.format('YYYY-MM-DD'),
       };
 
-      await api.put(`/tasks/${taskToEdit.id}`, updatedTask);
+      await api.put(`/tasks/${selectedTask?.id}`, updatedTask);
       message.success('Tarefa editada com sucesso!');
       refreshTasks();
       onClose();
     } catch (error: any) {
-      message.error(error.response?.data?.message || 'Erro ao editar tarefa!');
+      message.error(error.response?.data?.message || 'Erro ao editar a tarefa!');
     }
   };
 
@@ -56,6 +50,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ visible, onClose, taskToE
       onCancel={() => {
         form.resetFields();
         setIsNewCategory(false);
+        message.info('Edição da tarefa cancelada');
         onClose();
       }}
       footer={null}
@@ -64,7 +59,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ visible, onClose, taskToE
       <Form
         form={form}
         layout="vertical"
-        onFinish={handleEdit}
+        onFinish={handleSubmit}
       >
         <Form.Item
           label="Título"
@@ -87,11 +82,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ visible, onClose, taskToE
           name="dueDate"
           rules={[{ required: true, message: 'Por favor, selecione o prazo!' }]}
         >
-          <DatePicker
-            format="DD/MM/YYYY"
-            style={{ width: '100%' }}
-            value={form.getFieldValue('dueDate')}
-          />
+          <DatePicker format="DD/MM/YYYY" style={{ width: '100%' }} />
         </Form.Item>
 
         <Form.Item
@@ -133,15 +124,10 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({ visible, onClose, taskToE
             type="primary"
             htmlType="submit"
             style={{ marginRight: 8 }}
-            disabled={
-              !form.isFieldsTouched(true) || !!form.getFieldsError().filter(({ errors }) => errors.length).length
-            }
           >
             Concluir
           </Button>
-          <Button onClick={onClose}>
-            Cancelar
-          </Button>
+          <Button onClick={() => onClose()}>Cancelar</Button>
         </Form.Item>
       </Form>
     </Modal>

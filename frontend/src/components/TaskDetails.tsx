@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Space, Button } from 'antd';
+import EditTaskModal from './EditTaskModal';
 
 interface Task {
   id: number;
@@ -18,7 +19,9 @@ interface TaskDetailsProps {
 const TaskDetails: React.FC<TaskDetailsProps> = ({
   task,
   onTaskAction,
-}) => (
+}) => {
+  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+  return (
   <Card title="Detalhes da Tarefa">
     {task ? (
       <div>
@@ -36,22 +39,23 @@ const TaskDetails: React.FC<TaskDetailsProps> = ({
           <strong>Descrição:</strong> {task.description}
         </p>
         <Space style={{ marginTop: 16 }}>
-          <Button type="primary" onClick={() => {}}>
-            Adicionar Tarefa
-          </Button>
-          <Button onClick={() => {}}>Editar Tarefa</Button>
-          <Button type="default" onClick={() => onTaskAction('complete')}>
+        <Button onClick={() => setIsEditModalVisible(true)}>Editar Tarefa</Button>
+          <Button  type="primary" onClick={() => onTaskAction('complete')}>
             Concluir
           </Button>
           <Button type="primary" danger onClick={() => onTaskAction('delete')}>
             Excluir
           </Button>
         </Space>
+        <EditTaskModal
+            visible={isEditModalVisible}
+            onClose={() => setIsEditModalVisible(false)}
+          />
       </div>
     ) : (
       <p>Nenhuma tarefa selecionada.</p>
     )}
-  </Card>
-);
+  </Card>)
+};
 
 export default TaskDetails;
