@@ -1,12 +1,15 @@
-// frontend/src/pages/DashboardPage.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { Layout, message } from 'antd';
 import { useTasks } from '../contexts/TasksContext';
+import { PlusOutlined } from '@ant-design/icons';
+import AddTaskModal from '../components/AddTaskModal';
 import HeaderComponent from '../components/Header';
 import FiltersComponent from '../components/Filters';
 import TasksTableComponent from '../components/TasksTable';
 import TaskDetailsComponent from '../components/TaskDetails';
 import { completeTask, deleteTask } from '../services/taskService';
+import { Button } from 'antd';
+
 
 const { Content } = Layout;
 
@@ -15,15 +18,10 @@ const DashboardPage: React.FC = () => {
     filteredTasks,
     selectedTask,
     setSelectedTask,
-    search,
-    filterCategory,
-    filterStatus,
-    setSearch,
-    setFilterCategory,
-    setFilterStatus,
-    clearFilters,
     refreshTasks,
   } = useTasks();
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -53,6 +51,14 @@ const DashboardPage: React.FC = () => {
       <Content style={{ padding: '20px', display: 'flex', gap: '20px' }}>
         <div style={{ flex: 1 }}>
           <FiltersComponent/>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            style={{ marginBottom: 16 }}
+            onClick={() => setIsModalVisible(true)}
+          >
+            Adicionar Tarefa
+          </Button>
           <TasksTableComponent
             filteredTasks={filteredTasks}
             onTaskSelect={setSelectedTask}
@@ -64,6 +70,10 @@ const DashboardPage: React.FC = () => {
             onTaskAction={handleTaskAction}
           />
         </div>
+        <AddTaskModal
+        visible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+      />
       </Content>
     </Layout>
   );

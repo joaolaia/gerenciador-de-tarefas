@@ -23,7 +23,7 @@ const TasksContext = createContext<TasksContextData>({} as TasksContextData);
 export const TasksProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
-  const [categories, setCategories] = useState<string[]>([]); // Adiciona categorias dinâmicas
+  const [categories, setCategories] = useState<string[]>([]);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [search, setSearch] = useState<string>('');
   const [filterCategory, setFilterCategory] = useState<string>('');
@@ -35,7 +35,6 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setTasks(tasksData);
       setFilteredTasks(tasksData);
 
-      // Extraia categorias únicas
       const uniqueCategories = Array.from(new Set(tasksData.map((task) => task.category)));
       setCategories(uniqueCategories);
 
@@ -71,7 +70,7 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const clearFilters = () => {
     setSearch('');
     setFilterCategory('');
-    setFilterStatus('pendente'); // Estado inicial volta para "pendente"
+    setFilterStatus('pendente');
   };
 
   return (
