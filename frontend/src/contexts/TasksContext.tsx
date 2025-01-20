@@ -35,10 +35,9 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       setTasks(tasksData);
       setFilteredTasks(tasksData);
 
-      const uniqueCategories = Array.from(new Set(tasksData.map((task) => task.category)));
-      setCategories(uniqueCategories);
-
-      const sortedTasks = tasksData.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+      const sortedTasks = tasksData.sort(
+        (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+      );
       setSelectedTask(sortedTasks[0] || null);
     } catch (error: any) {
       message.error(error.response?.data?.message || 'Erro ao carregar tarefas!');
@@ -50,10 +49,24 @@ export const TasksProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }, []);
 
   useEffect(() => {
+    const uniquePendingCategories = Array.from(
+      new Set(tasks.filter((task) => task.status === 'pendente').map((task) => task.category))
+    );
+    setCategories(uniquePendingCategories);
+
+    const sortedTasks = tasks.sort(
+      (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+    );
+    setSelectedTask(sortedTasks[0] || null);
+  }, [tasks]);
+
+  useEffect(() => {
     let filtered = tasks;
 
     if (search) {
-      filtered = filtered.filter((task) => task.title.toLowerCase().includes(search.toLowerCase()));
+      filtered = filtered.filter((task) =>
+        task.title.toLowerCase().includes(search.toLowerCase())
+      );
     }
 
     if (filterCategory) {
