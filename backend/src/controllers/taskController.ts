@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Task from '../models/task';
 import jwt from 'jsonwebtoken';
+import dayjs from 'dayjs';
 
 export const getAllTasks = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -24,41 +25,43 @@ export const getAllTasks = async (req: Request, res: Response): Promise<void> =>
 };
 
 export const createTask = async (req: Request, res: Response): Promise<void> => {
-    try {
-      const { title, description, status, dueDate, category } = req.body;
+  try {
+    const { title, description, status, dueDate, category } = req.body;
 
-      const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
+      res.status(401).json({ message: 'Token não fornecido.' });
       return;
     }
-  
-      if (!title || !category) {
-        res.status(400).json({ message: 'Título e categoria são obrigatórios.' });
-        return;
-      }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: number };
+    if (!title || !category) {
+      res.status(400).json({ message: 'Título e categoria são obrigatórios.' });
+      return;
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: number };
     const userId = decoded.id;
 
+    const adjustedDueDate = dayjs(dueDate).hour(23).minute(59).second(59).toDate();
 
-      const newTask = await Task.create({
-        title,
-        description,
-        status: status || 'pendente',
-        dueDate: dueDate || null,
-        category,
-        userId,
-      });
-  
-      res.status(201).json({
-        message: 'Tarefa criada com sucesso.',
-        task: newTask,
-      });
-    } catch (error) {
-      console.error('Erro ao criar tarefa:', error);
-      res.status(500).json({ message: 'Erro ao criar tarefa. Tente novamente mais tarde.' });
-    }
-  };
+    const newTask = await Task.create({
+      title,
+      description,
+      status: status || 'pendente',
+      dueDate: adjustedDueDate,
+      category,
+      userId,
+    });
+
+    res.status(201).json({
+      message: 'Tarefa criada com sucesso.',
+      task: newTask,
+    });
+  } catch (error) {
+    console.error('Erro ao criar tarefa:', error);
+    res.status(500).json({ message: 'Erro ao criar tarefa. Tente novamente mais tarde.' });
+  }
+};
 
   export const updateTask = async (req: Request, res: Response): Promise<void> => {
     try {

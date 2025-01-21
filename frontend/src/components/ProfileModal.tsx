@@ -20,7 +20,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ visible, onClose }) => {
       getProfile()
         .then((data) => {
           setUserData(data);
-          form.setFieldsValue(data); // Preenche o formulário com os dados do perfil
+          form.setFieldsValue(data);
         })
         .catch(() => message.error('Erro ao carregar perfil.'));
     }
@@ -55,7 +55,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ visible, onClose }) => {
   };
 
   const handleStartEditing = () => {
-    form.setFieldsValue(userData); // Preenche os inputs ao iniciar a edição
+    form.setFieldsValue(userData);
     setIsEditingProfile(true);
   };
 
