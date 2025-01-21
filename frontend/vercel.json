@@ -1,12 +1,12 @@
 {
-    "routes": [
+    "rewrites": [
       {
-        "src": "^/api/(.*)$",
-        "dest": "https://gerenciador-de-tarefas-production.up.railway.app/api/$1"
+        "source": "/api/(.*)",
+        "destination": "https://gerenciador-de-tarefas-production.up.railway.app/api/$1"
       },
       {
-        "src": "^/(.*)$",
-        "dest": "/index.html"
+        "source": "/(.*)",
+        "destination": "/index.html"
       }
     ]
   }
