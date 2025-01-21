@@ -15,7 +15,8 @@
   },
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "fix-permissions": "chmod +x node_modules/.bin/vite",
+    "build": "npm run fix-permissions && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
