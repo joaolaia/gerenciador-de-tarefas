@@ -6,7 +6,6 @@ export const getAllTasks = async (req: Request, res: Response): Promise<void> =>
   try {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
-      res.status(401).json({ message: 'Token não fornecido.' });
       return;
     }
 
@@ -16,11 +15,6 @@ export const getAllTasks = async (req: Request, res: Response): Promise<void> =>
     const tasks = await Task.findAll({
       where: { userId },
     });
-
-    if (tasks.length === 0) {
-      res.status(404).json({ message: 'Nenhuma tarefa cadastrada no momento.' });
-      return;
-    }
 
     res.status(200).json(tasks);
   } catch (error) {
@@ -35,7 +29,6 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
 
       const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
-      res.status(401).json({ message: 'Token não fornecido.' });
       return;
     }
   
